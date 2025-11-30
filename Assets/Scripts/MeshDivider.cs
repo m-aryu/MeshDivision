@@ -17,12 +17,8 @@ public class MeshDivider
     /// <summary>
     /// メッシュ分割を行う
     /// </summary>
-    public void DivideMesh(List<MeshData> meshDataList, Action onCompleteCalc, Action<MeshData> createMeshFunc)
+    public void DivideMesh(List<MeshData> meshDataList, float lineSlope, float lineIntercept, Action onCompleteCalc, Action<MeshData> createMeshFunc)
     {
-        // y=x+0.5 の直線でメッシュを分割する例
-        float lineSlope = 1.0f;
-        float lineIntercept = 0.5f;
-        
         _topVertexList.Clear();
         _botVertexList.Clear();
         _topTriangleList.Clear();

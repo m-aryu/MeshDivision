@@ -10,7 +10,10 @@ public class MeshCreator : MonoBehaviour
     [SerializeField] private Material _material;
     
     /// <summary> メッシュ情報リスト </summary>
-    public List<MeshData> MeshDataList = new List<MeshData>();
+    public List<MeshData> MeshDataList { get; private set; } = new List<MeshData>();
+    
+    // 生成済みオブジェクトリスト
+    private List<GameObject> _generatedObjectList = new List<GameObject>();
     
     /// <summary>
     /// メッシュ生成
@@ -20,8 +23,10 @@ public class MeshCreator : MonoBehaviour
         const float WIDTH = 1;
         const float HEIGHT = 1;
         // 1辺の頂点の数
-        const int ROW_NUM = 3;
-        const int COL_NUM = 3;
+        const int ROW_NUM = 8;
+        const int COL_NUM = 8;
+        
+        ClearMesh();
 
         // 頂点座標設定
         var vertexList = new List<Vector3>();
@@ -93,6 +98,7 @@ public class MeshCreator : MonoBehaviour
         meshRenderer.material = newMaterial;
         
         MeshDataList.Add(meshData);
+        _generatedObjectList.Add(newObject);
     }
     
     /// <summary>
@@ -100,11 +106,12 @@ public class MeshCreator : MonoBehaviour
     /// </summary>
     public void ClearMesh()
     {
-        var existingObject = GameObject.Find("GeneratedMesh");
-        if (existingObject != null)
+        foreach (var obj in _generatedObjectList)
         {
-            Destroy(existingObject);
+            Destroy(obj);
         }
+        _generatedObjectList.Clear();
+        
         MeshDataList.Clear();
     }
 }
