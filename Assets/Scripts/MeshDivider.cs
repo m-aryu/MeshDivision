@@ -214,7 +214,8 @@ public class MeshDivider
         
         // 交点情報
         float crossX = (b - c) / (m - a);
-        if (crossX < Mathf.Min(v1.x, v2.x) || crossX > Mathf.Max(v1.x, v2.x))
+        if (crossX < Mathf.Min(v1.x, v2.x) || Mathf.Approximately(crossX, Mathf.Min(v1.x, v2.x)) ||
+            crossX > Mathf.Max(v1.x, v2.x) || Mathf.Approximately(crossX, Mathf.Max(v1.x, v2.x)))
         {
             // 線分の範囲外
             return false;
