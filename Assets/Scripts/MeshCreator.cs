@@ -9,6 +9,15 @@ public class MeshCreator : MonoBehaviour
     /// <summary> Material </summary>
     [SerializeField] private Material _material;
     
+    // 頂点座標リスト
+    private List<Vector3> _vertexList = new List<Vector3>();
+    
+    // 三角形の頂点インデックスリスト
+    private List<int> _triangleList = new List<int>();
+    
+    // UVリスト
+    private List<Vector2> _uvList = new List<Vector2>();
+    
     private void Start()
     {
         CreateMesh();
@@ -42,6 +51,7 @@ public class MeshCreator : MonoBehaviour
             }
         }
         newMesh.SetVertices(vertexList);
+        _vertexList = vertexList;
         
         // 三角形の頂点インデックス設定
         var triangleList = new List<int>();
@@ -63,6 +73,7 @@ public class MeshCreator : MonoBehaviour
             }
         }
         newMesh.SetTriangles(triangleList, 0);
+        _triangleList = triangleList;
         
         // UV設定
         var uvList = new List<Vector2>();
@@ -76,6 +87,7 @@ public class MeshCreator : MonoBehaviour
             }
         }
         newMesh.SetUVs(0, uvList);
+        _uvList = uvList;
         
         // 変更の反映
         newMesh.RecalculateNormals();
