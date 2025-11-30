@@ -5,6 +5,9 @@ using UnityEngine;
 /// </summary>
 public class MeshCreator : MonoBehaviour
 {
+    /// <summary> Material </summary>
+    [SerializeField] private Material _material;
+    
     private void Start()
     {
         CreateMesh();
@@ -16,8 +19,8 @@ public class MeshCreator : MonoBehaviour
     private void CreateMesh()
     {
         var newObject = new GameObject("GeneratedMesh");
-        newObject.AddComponent<MeshFilter>();
-        newObject.AddComponent<MeshRenderer>();
+        var meshFilter = newObject.AddComponent<MeshFilter>();
+        var meshRenderer = newObject.AddComponent<MeshRenderer>();
         var newMesh = new Mesh();
 
         var width = 1;
@@ -52,6 +55,7 @@ public class MeshCreator : MonoBehaviour
         
         // 変更の反映
         newMesh.RecalculateNormals();
-        newObject.GetComponent<MeshFilter>().mesh = newMesh;
+        meshFilter.mesh = newMesh;
+        meshRenderer.material = _material;
     }
 }
