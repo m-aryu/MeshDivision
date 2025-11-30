@@ -9,35 +9,19 @@ public class MeshCreator : MonoBehaviour
     /// <summary> Material </summary>
     [SerializeField] private Material _material;
     
-    // 頂点座標リスト
-    private List<Vector3> _vertexList = new List<Vector3>();
-    
-    // 三角形の頂点インデックスリスト
-    private List<int> _triangleList = new List<int>();
-    
-    // UVリスト
-    private List<Vector2> _uvList = new List<Vector2>();
-    
-    private void Start()
-    {
-        CreateMesh();
-    }
+    /// <summary> メッシュ情報リスト </summary>
+    public List<MeshData> MeshDataList = new List<MeshData>();
     
     /// <summary>
     /// メッシュ生成
     /// </summary>
-    private void CreateMesh()
+    public void CreateFirstMesh()
     {
         const float WIDTH = 1;
         const float HEIGHT = 1;
         // 1辺の頂点の数
         const int ROW_NUM = 3;
         const int COL_NUM = 3;
-        
-        var newObject = new GameObject("GeneratedMesh");
-        var meshFilter = newObject.AddComponent<MeshFilter>();
-        var meshRenderer = newObject.AddComponent<MeshRenderer>();
-        var newMesh = new Mesh();
 
         // 頂点座標設定
         var vertexList = new List<Vector3>();
@@ -50,8 +34,6 @@ public class MeshCreator : MonoBehaviour
                 vertexList.Add(new Vector3(x, y, 0));
             }
         }
-        newMesh.SetVertices(vertexList);
-        _vertexList = vertexList;
         
         // 三角形の頂点インデックス設定
         var triangleList = new List<int>();
@@ -72,8 +54,6 @@ public class MeshCreator : MonoBehaviour
                 }
             }
         }
-        newMesh.SetTriangles(triangleList, 0);
-        _triangleList = triangleList;
         
         // UV設定
         var uvList = new List<Vector2>();
@@ -86,12 +66,45 @@ public class MeshCreator : MonoBehaviour
                 uvList.Add(new Vector2(u, v));
             }
         }
-        newMesh.SetUVs(0, uvList);
-        _uvList = uvList;
+        
+        var meshData = new MeshData(vertexList, triangleList, uvList);
+        CreateMesh(meshData);
+    }
+    
+    /// <summary>
+    /// 汎用メッシュ生成処理
+    /// </summary>
+    public void CreateMesh(MeshData meshData)
+    {
+        var newObject = new GameObject("GeneratedMesh");
+        var meshFilter = newObject.AddComponent<MeshFilter>();
+        var meshRenderer = newObject.AddComponent<MeshRenderer>();
+        var newMesh = new Mesh();
+
+        newMesh.SetVertices(meshData.VertexList);
+        newMesh.SetTriangles(meshData.TriangleList, 0);
+        newMesh.SetUVs(0, meshData.UvList);
         
         // 変更の反映
         newMesh.RecalculateNormals();
         meshFilter.mesh = newMesh;
-        meshRenderer.material = _material;
+        var newMaterial = new Material(_material);
+        newMaterial.color = new Color(Random.Range(0,1f), Random.Range(0,1f), Random.Range(0,1f));
+        meshRenderer.material = newMaterial;
+        
+        MeshDataList.Add(meshData);
+    }
+    
+    /// <summary>
+    /// メッシュ破棄
+    /// </summary>
+    public void ClearMesh()
+    {
+        var existingObject = GameObject.Find("GeneratedMesh");
+        if (existingObject != null)
+        {
+            Destroy(existingObject);
+        }
+        MeshDataList.Clear();
     }
 }
