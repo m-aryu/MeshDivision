@@ -6,7 +6,7 @@ using UnityEngine;
 public class SceneManager : MonoBehaviour
 {
     private const float MOVE_LINE_SPEED = 5f;
-    private const float ROTATE_LINE_SPEED = 5f;
+    private const float ROTATE_LINE_SPEED = 15f;
     
     /// <summary> メッシュ生成機 </summary>
     [SerializeField] private MeshCreator _meshCreator;
@@ -20,7 +20,6 @@ public class SceneManager : MonoBehaviour
     private void Start()
     {
         _meshCreator.CreateFirstMesh();
-        
         _meshDivider = new MeshDivider();
     }
     
@@ -29,7 +28,6 @@ public class SceneManager : MonoBehaviour
         // 分割線の回転
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            
             if (Input.GetKey(KeyCode.UpArrow))
             {
                 _divideLine.transform.Rotate(0, 0, ROTATE_LINE_SPEED * Time.deltaTime);

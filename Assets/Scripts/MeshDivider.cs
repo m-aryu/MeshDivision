@@ -7,25 +7,38 @@ using UnityEngine;
 /// </summary>
 public class MeshDivider
 {
-    // 分割後の頂点リスト
-    private List<Vector3> _topVertexList = new List<Vector3>();
-    private List<Vector3> _botVertexList = new List<Vector3>();
-    // 分割後の三角形リスト
-    private List<int> _topTriangleList = new List<int>();
-    private List<int> _botTriangleList = new List<int>();
+    /// <summary>
+    /// 分割結果
+    /// </summary>
+    public class DivideResult
+    {
+        /// <summary> 分割後の頂点リスト 上側 </summary>
+        public List<Vector3> TopVertexList = new List<Vector3>();
+        
+        /// <summary> 分割後の頂点リスト 下側 </summary>
+        public List<Vector3> BotVertexList = new List<Vector3>();
+        
+        /// <summary> 分割後の三角形リスト 上側 </summary>
+        public List<int> TopTriangleList = new List<int>();
+        
+        /// <summary> 分割後の三角形リスト 下側 </summary>
+        public List<int> BotTriangleList = new List<int>();
+    }
+    
+    // 分割結果リスト
+    private List<DivideResult> _resultList = new List<DivideResult>();
     
     /// <summary>
     /// メッシュ分割を行う
     /// </summary>
     public void DivideMesh(List<MeshData> meshDataList, float lineSlope, float lineIntercept, Action onCompleteCalc, Action<MeshData> createMeshFunc)
     {
-        _topVertexList.Clear();
-        _botVertexList.Clear();
-        _topTriangleList.Clear();
-        _botTriangleList.Clear();
+        _resultList.Clear();
         
         for (int mdIdx = 0; mdIdx < meshDataList.Count; mdIdx++)
         {
+            var result = new DivideResult();
+            
             var meshData = meshDataList[mdIdx];
             for (int triIdx = 0; triIdx < meshData.TriangleList.Count; triIdx += 3)
             {
@@ -37,16 +50,21 @@ public class MeshDivider
                 Vector3 v1 = meshData.VertexList[idx1];
                 Vector3 v2 = meshData.VertexList[idx2];
                 
-                DivideSingleTriangle(v0, v1, v2, lineSlope, lineIntercept);
+                DivideSingleTriangle(v0, v1, v2, lineSlope, lineIntercept, result);
             }
+            
+            _resultList.Add(result);
         }
         
         // 最後に、分割したメッシュで再生成
         onCompleteCalc?.Invoke();
-        var topMeshData = new MeshData(_topVertexList, _topTriangleList, new List<Vector2>());
-        var botMeshData = new MeshData(_botVertexList, _botTriangleList, new List<Vector2>());
-        createMeshFunc?.Invoke(topMeshData);
-        createMeshFunc?.Invoke(botMeshData);
+        foreach (var divideResult in _resultList)
+        {
+            var topMeshData = new MeshData(divideResult.TopVertexList, divideResult.TopTriangleList, new List<Vector2>());
+            var botMeshData = new MeshData(divideResult.BotVertexList, divideResult.BotTriangleList, new List<Vector2>());
+            createMeshFunc?.Invoke(topMeshData);
+            createMeshFunc?.Invoke(botMeshData);
+        }
     }
     
     /// <summary>
@@ -55,7 +73,7 @@ public class MeshDivider
     /// <remarks>
     /// 直線: y = ax + b
     /// </remarks>
-    private void DivideSingleTriangle(Vector3 v1, Vector3 v2, Vector3 v3, float a, float b)
+    private void DivideSingleTriangle(Vector3 v1, Vector3 v2, Vector3 v3, float a, float b, DivideResult result)
     {
         // 三角形の各辺と直線の交差判定
         var isCross1 = IsCrossing(v1, v2, a, b, out Vector3 crossPoint1);
@@ -142,8 +160,8 @@ public class MeshDivider
             float centerX = (vert1.x + vert2.x + vert3.x) / 3.0f;
             float centerY = (vert1.y + vert2.y + vert3.y) / 3.0f;
             float lineY = a * centerX + b;
-            var targetVertexList = (centerY < lineY) ? _botVertexList : _topVertexList;
-            var targetTriangleList = (centerY < lineY) ? _botTriangleList : _topTriangleList;
+            var targetVertexList = (centerY < lineY) ? result.BotVertexList : result.TopVertexList;
+            var targetTriangleList = (centerY < lineY) ? result.BotTriangleList : result.TopTriangleList;
             
             targetVertexList.Add(vert1);
             targetVertexList.Add(vert2);
