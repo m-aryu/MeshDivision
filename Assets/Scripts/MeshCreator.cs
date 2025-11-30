@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -18,40 +19,63 @@ public class MeshCreator : MonoBehaviour
     /// </summary>
     private void CreateMesh()
     {
+        const float WIDTH = 1;
+        const float HEIGHT = 1;
+        // 1辺の頂点の数
+        const int ROW_NUM = 3;
+        const int COL_NUM = 3;
+        
         var newObject = new GameObject("GeneratedMesh");
         var meshFilter = newObject.AddComponent<MeshFilter>();
         var meshRenderer = newObject.AddComponent<MeshRenderer>();
         var newMesh = new Mesh();
 
-        var width = 1;
-        var height = 1;
-        
         // 頂点座標設定
-        // 2--3
-        // |  |
-        // 0--1
-        Vector3[] vertices = new Vector3[4];
-        vertices[0] = new Vector3(0, 0, 0);
-        vertices[1] = new Vector3(width, 0, 0);
-        vertices[2] = new Vector3(0, height, 0);
-        vertices[3] = new Vector3(width, height, 0);
-        newMesh.SetVertices(vertices);
+        var vertexList = new List<Vector3>();
+        for (int rowIdx = 0; rowIdx < ROW_NUM; rowIdx++)
+        {
+            for (int colIdx = 0; colIdx < COL_NUM; colIdx++)
+            {
+                float x = colIdx % COL_NUM * WIDTH;
+                float y = rowIdx * HEIGHT;
+                vertexList.Add(new Vector3(x, y, 0));
+            }
+        }
+        newMesh.SetVertices(vertexList);
         
         // 三角形の頂点インデックス設定
-        int[] triangles = new int[6]
+        var triangleList = new List<int>();
+        for (int rowIdx = 0; rowIdx < ROW_NUM; rowIdx++)
         {
-            0, 2, 1,
-            2, 3, 1
-        };
-        newMesh.SetTriangles(triangles, 0);
+            for (int colIdx = 0; colIdx < COL_NUM; colIdx++)
+            {
+                int currentIdx = rowIdx * ROW_NUM + colIdx;
+                if (colIdx < COL_NUM - 1 && rowIdx < ROW_NUM - 1)
+                {
+                    triangleList.Add(currentIdx);
+                    triangleList.Add(currentIdx + COL_NUM);
+                    triangleList.Add(currentIdx + 1);
+
+                    triangleList.Add(currentIdx + 1);
+                    triangleList.Add(currentIdx + COL_NUM);
+                    triangleList.Add(currentIdx + COL_NUM + 1);
+                }
+            }
+        }
+        newMesh.SetTriangles(triangleList, 0);
         
         // UV設定
-        Vector2[] uv = new Vector2[4];
-        uv[0] = new Vector2(0, 0);
-        uv[1] = new Vector2(1, 0);
-        uv[2] = new Vector2(0, 1);
-        uv[3] = new Vector2(1, 1);
-        newMesh.uv = uv;
+        var uvList = new List<Vector2>();
+        for (int rowIdx = 0; rowIdx < ROW_NUM; rowIdx++)
+        {
+            for (int colIdx = 0; colIdx < COL_NUM; colIdx++)
+            {
+                float u = rowIdx / (ROW_NUM - 1);
+                float v = colIdx / (COL_NUM - 1);
+                uvList.Add(new Vector2(u, v));
+            }
+        }
+        newMesh.SetUVs(0, uvList);
         
         // 変更の反映
         newMesh.RecalculateNormals();
