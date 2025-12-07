@@ -11,6 +11,9 @@ public class SceneManager : MonoBehaviour
     /// <summary> メッシュ生成機 </summary>
     [SerializeField] private MeshCreator _meshCreator;
     
+    /// <summary> メッシュインポーター </summary>
+    [SerializeField] private MeshImporter _meshImporter;
+    
     /// <summary> 分割線 </summary>
     [SerializeField] private GameObject _divideLine;
     
@@ -19,7 +22,12 @@ public class SceneManager : MonoBehaviour
 
     private void Start()
     {
-        _meshCreator.CreateFirstMesh();
+        // メッシュをコードから生成する場合はこっち
+        //_meshCreator.CreateFirstMesh();
+        
+        // 既成メッシュをインポートする場合はこっち
+        _meshImporter.ImportMesh(_meshCreator);
+        
         _meshDivider = new MeshDivider();
     }
     

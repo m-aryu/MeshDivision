@@ -100,6 +100,15 @@ public class MeshCreator : MonoBehaviour
         MeshDataList.Add(meshData);
         _generatedObjectList.Add(newObject);
     }
+
+    /// <summary>
+    /// メッシュのインポートを行う
+    /// </summary>
+    public void ImportMesh(MeshData meshData)
+    {       
+        ClearMesh();
+        CreateMesh(meshData);
+    }
     
     /// <summary>
     /// メッシュ破棄
